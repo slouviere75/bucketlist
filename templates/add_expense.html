@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Add an expense
+{% endblock %}
+
+{% block body %}
+    <h1>New Expense for {{trip.name}}</h1>
+            <h2>
+            {{  message }}
+
+            </h2>
+            <div class="container">
+                <form action="{{ url_for('add_expense', trip_id=trip.id) }}" method="POST">
+                            <h3>
+                                <div class="form-inp"><input name="name" type="text" placeholder="Expense Name"></div>
+                                <div class="form-inp"><input name="category" type="text" placeholder="Category"></div>
+                                <div class="form-inp"><input name="frequency" type="text" placeholder="Frequency"></div>
+                                <div class="form-inp"><input name="amount" type="number" placeholder="Amount"</div>
+                                <div class="form-inp"><input name="date" type="date" placeholder="Date"></div>
+                                <div class="form-inp"><button>Add Expense</button></div>
+                            </h3>
+                </form>
+            </div>
+
+{% endblock %}

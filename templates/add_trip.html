@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Add a trip
+{% endblock %}
+
+{% block body %}
+    <h1>New Trip for {{activeuser}}</h1>
+            <h2>
+            {{  message }}
+
+            </h2>
+            <div class="container">
+                <form action="{{ url_for('trips') }}" method="POST">
+                            <h3>
+                                <div class="form-inp"><input name="name" type="text" placeholder="Trip Name"></div>
+                                <div class="form-inp"><input name="description" type="text" placeholder="Description"></div>
+                                <div class="form-inp"><input name="origin" type="text" placeholder="Origin"></div>
+                                <div class="form-inp"><input name="destination" type="text" placeholder="Destination"</div>
+                                <div class="form-inp"><input name="departure_date" type="date"placeholder="Departure Date"></div>
+                                <div class="form-inp"><input name="duration" type="text"placeholder="Duration(days)"></div>
+                                <div class="form-inp"><button>Add Trip</button></div>
+                            </h3>
+                </form>
+            </div>
+
+{% endblock %}

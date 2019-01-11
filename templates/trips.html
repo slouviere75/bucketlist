@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    My Trips
+{% endblock %}
+
+{% block body %}
+<h1>My Trips</h1>
+
+<div><a class="nav-link" href="{{url_for('add_trip')}}">Add Trip</a></div>
+
+    {% for trip in trips %}
+    <div class="container">{{ trip.name }} <a class="nav-link" href="{{url_for('delete_trip', trip_id = trip.id)}}" >Delete Trip</a>
+
+        <!--<ul class="nav justify-content-end">-->
+        <!--<li class="nav-item">-->
+        <!--<form action="{{ url_for('delete_trip', trip_id=trip.id) }}" method="post">-->
+        <!--<button type="button" class="btn btn-primary">Delete Trip</button>-->
+        <!--</form>-->
+        <!--</li>-->
+        <!--</ul>-->
+
+        <div class="row">
+            <div>{{trip.description}}</div>
+            <div>{{ trip.destination }}</div>
+            <div>{{ trip.departure_date}}</div>
+            <div>{{trip.duration}} Days</div>
+            <div>${{trip.cost}}</div>
+        </div>
+
+            <a class="nav-link" href="{{url_for('add_expense', trip_id = trip.id)}}" >Add Expense</a>
+        <table class="table table-hover">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">Expense Name</th>
+                <th scope="col">Frequency</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for expense in trip.expenses %}
+            <tr>
+                <th scope="row">{{ expense.name }}</th>
+                <td>{{ expense.frequency }}</td>
+                <td>{{ expense.amount }}</td>
+                <td>{{ expense.date }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endfor %}
+
+    {% endblock %}
