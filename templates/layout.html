@@ -7,14 +7,74 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
         <style>
+            html {
+              font-size: 1rem;
+            }
+
+            @include media-breakpoint-up(sm) {
+              html {
+                font-size: 1.2rem;
+              }
+            }
+
+            @include media-breakpoint-up(md) {
+              html {
+                font-size: 1.4rem;
+              }
+            }
+
+            @include media-breakpoint-up(lg) {
+              html {
+                font-size: 1.6rem;
+              }
+            }
+            .blockquote {
+                background: rgba(204, 204, 204, 0.5)
+
+                ;
+            }
              .container {
-                padding: 30px;
-                margin: 30px;
-                background-color: darkblue;
-                border-radius: 16px;
+                padding: 2%;
+                margin: 2%;
+                background-color: #505660;
+                border-radius: 10px;
                 color:white;
                 font-weight: bold;
 
+            }
+            .menu {
+                padding-left: 35px;
+                padding-top: 10px;
+            }
+            .bumper {
+                margin-top: 106px;
+            }
+
+            .no_jump {
+                margin: 10px;
+                display: inline-block;
+
+            }
+            .centered {
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                }
+
+            .top-left {
+                  position: absolute;
+                  top: 10%;
+                  left: 5%;
+                }
+
+            .no-padding {
+                padding:3px;
+                margin:0px;
+            }
+            .p-2 > * {
+                padding: 3  px;
+                margin: 0px;
             }
             .row {
                 padding:10px;
@@ -28,6 +88,11 @@
                 border-radius: 8px;
                 color: black;
                 font-weight: normal;
+            }
+            .light-txt {
+                color: white;
+            }
+            .inline  {
             }
             .login {
                 display: flex;
@@ -44,43 +109,85 @@
 
 
             }
-
+            h1 > a {
+                padding-left: 2pc;
+            }
+            .container > a, h3, h4, h5{
+                display: inline-block;
+            }
             h1, h2 {
                 align-items: center;
                 font-weight: bold;
                 color: black;
                 text-align: center;
             }
+            @media (max-width: 978px) {
+                .container {
+                  padding:1%;
+                  margin:1%;
+                }
+
+                body {
+                  padding:0;
+                }
+
+                .navbar-fixed-top, .navbar-fixed-bottom, .navbar-static-top {
+                  margin-left: 0;
+                  margin-right: 0;
+                  margin-bottom:0;
+                }
+            }
         </style>
     </head>
     <body>
 
+        <nav class="navbar navbar-expand-sm fixed-top navbar-dark bg-dark">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+            <div class="justify-content-right light-txt"></div>
+            <div class="justify-content-right"><img src="/static/images/logow.png" height="90"></div>
 
-        <ul class="nav justify-content-end">
-          <li class="nav-item">
-            <a class="nav-link active" href="#">{{ message }}</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="#">{{ activeuser.username }}</a>
-          </li>
-          {%if activeuser!=None %}
-          <li class="nav-item">
-            <a class="nav-link" href="{{url_for('index')}}">Logout</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Profile</a>
-          </li>
-          {%else%}
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('register_def') }}">Register</a>
-          </li>
-          {%endif%}
-        </ul>
 
+              <div class="collapse navbar-collapse" id="navbarText">
+                  {% if activeuser %}<h6 class="light-txt no_jump">{{activeuser.username}}</h6><a class="no_jump btn btn-success btn-sm" href="{{url_for('logout')}}">Logout</a>{% endif %}
+                <ul class="navbar-nav mr-auto">
+                  <li class="nav-item active">
+                    <a class="nav-link" href="{{url_for('index')}}">Home<span class="sr-only">(current)</span></a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Blog</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{url_for('bucketlist')}}">Bucketlist Planner</a>
+                  <!--<hr class="my-4">-->
+                  </li>
+                  {%if activeuser!=None %}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('life_budget')}}">Life Budget</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{url_for('bucketlist')}}">Trip Budget</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link" href="{{url_for('reports')}}" >Report Analysis</a>
+                  </li>
+                  {%else%}
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+                  </li>
+                  {%endif%}
+                </ul>
+              </div>
+        </nav>
+
+        <div class="bumper">
             {% block body %}
             {% endblock %}
-
-
+        </div>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 
     </body>
 </html>

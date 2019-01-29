@@ -1,55 +1,64 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    My Trips
+    My Trips {{trip_id}}
 {% endblock %}
 
 {% block body %}
-<h1>My Trips</h1>
+    <h3 class="menu">Trip Budget</h3><br>
 
-<div><a class="nav-link" href="{{url_for('add_trip')}}">Add Trip</a></div>
-
-    {% for trip in trips %}
-    <div class="container">{{ trip.name }} <a class="nav-link" href="{{url_for('delete_trip', trip_id = trip.id)}}" >Delete Trip</a>
-
-        <!--<ul class="nav justify-content-end">-->
-        <!--<li class="nav-item">-->
-        <!--<form action="{{ url_for('delete_trip', trip_id=trip.id) }}" method="post">-->
-        <!--<button type="button" class="btn btn-primary">Delete Trip</button>-->
-        <!--</form>-->
-        <!--</li>-->
-        <!--</ul>-->
+    <h3 class="menu"><a href="{{url_for('add_trip')}}" class="btn btn-success btn-lg">
+        <span class="glyphicon glyphicon-print"></span>Add Trip</a></h3>
+    {% for trip in activeuser.trips %}
+        <div id="trip{{trip.id}}" class="container">
+            <div class="d-flex">
+            <div class="p-2 mr-auto"><h3>{{trip.name}} </h3> <h4> ( {{trip.departure_date}} to {{trip.return_date}} )</h4></div>
+            <div class="p-2"><h3>{{'${:,.2f}'.format(trip.cost)}}</h3></div>
+            </div>
+        <a href="{{url_for('edit_trip', trip_id=trip.id)}}" class="btn btn-success btn-md">
+        <span class="glyphicon glyphicon-print"></span>Edit Trip</a>   <a href="{{url_for('delete_trip', trip_id=trip.id)}}" class="btn btn-success btn-md">
+        <span class="glyphicon glyphicon-print"></span>Delete Trip</a>
 
         <div class="row">
-            <div>{{trip.description}}</div>
-            <div>{{ trip.destination }}</div>
-            <div>{{ trip.departure_date}}</div>
-            <div>{{trip.duration}} Days</div>
-            <div>${{trip.cost}}</div>
+            <div class="container">{{trip.description}}</div>
         </div>
 
-            <a class="nav-link" href="{{url_for('add_expense', trip_id = trip.id)}}" >Add Expense</a>
+            <a class="nav-link no_jump btn btn-success btn-sm" href="{{url_for('add_expense', trip_id = trip.id)}}" >Add Expense</a>
         <table class="table table-hover">
             <thead class="thead-dark">
             <tr>
                 <th scope="col">Expense Name</th>
-                <th scope="col">Frequency</th>
+                <th scope="col">Category</th>
                 <th scope="col">Amount</th>
                 <th scope="col">Date</th>
+                <th scope="col">End Date</th>
             </tr>
             </thead>
             <tbody>
             {% for expense in trip.expenses %}
             <tr>
-                <th scope="row">{{ expense.name }}</th>
-                <td>{{ expense.frequency }}</td>
-                <td>{{ expense.amount }}</td>
+                <td>
+                    <div class="d-flex">
+                        <div class="p-2 mr-auto"><h5>{{expense.name}}</h5></div>
+                        <div class="p-2"><a class="btn btn-success btn-sm no-padding" href="{{url_for('edit_expense', expense_id = expense.id)}}" >Edit</a></div>
+                        <div class="p-2"><a class="btn btn-success btn-sm no-padding" href="{{url_for('delete_expense', id = expense.id)}}">Delete</a></div>
+                    </div>
+                </td>
+                <td>{{ expense.category }}</td>
+                <td>{{'${:,.2f}'.format(expense.amount)}} / {{expense.frequency}}</td>
                 <td>{{ expense.date }}</td>
+                <td>{{expense.end_date}}</td>
             </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
-    {% endfor %}
 
+    {% endfor %}
+    {% if trip_id %}
+    <script>
+        document.getElementById('trip{{trip_id}}').scrollIntoView();
+        // document.location.hash = '#trip' + '{{ trip_id }}';
+    </script>
+    {% endif %}
     {% endblock %}

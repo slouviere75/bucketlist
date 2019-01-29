@@ -1,31 +1,39 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    BestLife
+    Bucketlist Planner
 {% endblock %}
 
 {% block body %}
-
-    <h1>Login
-        {{ message }}
-        {% if activeuser !="None" %}
-        {{activeuser.username}}
-        {% endif %}
-    </h1>
-
-    <form action=" {{ url_for('index') }}" method="POST">
-        <div class="container">
-            <h3>
-                <div class="form-group"><input name="username" type="text" placeholder="Username" autofocus></div>
-                <div class="form-group"><input name="password" type="password" placeholder="Password"></div>
-                <div class="form-group"><button>Login</button></div>
-            </h3>
+       <div id="carouselLoaded" class="carousel slide carousel-fade" data-ride="carousel" data-pause="false">
+           <div class="carousel-inner">
+                <div class="carousel-item active" data-interval="4000">
+                    <img src="/static/images/{{carousel_first}}" class="d-block w-100" alt="test1">
+                    <div class="centered d-none d-md-block"><blockquote class="blockquote text-center">
+                      <p class="mb-0">{{quotes[0].quote}}</p>
+                      <footer class="blockquote-footer">~<cite title="{{quotes[0].source}}">{{quotes[0].source}}</cite></footer>
+                    </blockquote></div>
+                </div>
+               {% set count = 1 %}
+               {% for c in carousel_images %}
+               <div class="carousel-item"  data-interval="4000">
+                    <img src="/static/images/{{c}}" class="d-block w-100" alt="test1">
+                   <div class="top-left"><blockquote class="blockquote text-center">
+                      <p class="mb-0">{{quotes[count].quote}}</p>
+                      <footer class="blockquote-footer">~<cite title="{{quotes[0].source}}">{{quotes[0].source}}</cite></footer>
+                    </blockquote></div>
+               </div>
+               {% set count = count + 1 %}
+               {% endfor %}
+            </div>
+               <a class="carousel-control-prev" href="#carouselLoaded" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+              </a>
+              <a class="carousel-control-next" href="#carouselLoaded" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+              </a>
         </div>
-    </form>
-
-<h1>
-        bestlife.com
-    </h1>
-
 
 {% endblock %}

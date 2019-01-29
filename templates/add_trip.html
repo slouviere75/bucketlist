@@ -1,26 +1,22 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Add a trip
+    {% if trip.id==-1 %}Add {% else %}Update {% endif %}Trip
 {% endblock %}
 
 {% block body %}
-    <h1>New Trip for {{activeuser}}</h1>
-            <h2>
-            {{  message }}
-
-            </h2>
+    <h3 class="menu">{% if trip.id==-1 %} Add {% else %} Update {% endif %} Trip</h3>
             <div class="container">
-                <form action="{{ url_for('trips') }}" method="POST">
-                            <h3>
-                                <div class="form-inp"><input name="name" type="text" placeholder="Trip Name"></div>
-                                <div class="form-inp"><input name="description" type="text" placeholder="Description"></div>
-                                <div class="form-inp"><input name="origin" type="text" placeholder="Origin"></div>
-                                <div class="form-inp"><input name="destination" type="text" placeholder="Destination"</div>
-                                <div class="form-inp"><input name="departure_date" type="date"placeholder="Departure Date"></div>
-                                <div class="form-inp"><input name="duration" type="text"placeholder="Duration(days)"></div>
-                                <div class="form-inp"><button>Add Trip</button></div>
-                            </h3>
+                <form action="{{ url_for('trips', trip_id = trip.id) }}" method="POST">
+                            <h4>
+                                <div class="form-group"><input name="name" value="{{trip.name}}" type="text" placeholder="Trip Name" required></div>
+                                <div class="form-group"><input name="description" value="{{trip.description}}" type="text" placeholder="Description" required></div>
+                                <div class="form-group"><input name="origin" value="{{trip.origin}}" type="text" placeholder="Origin" required></div>
+                                <div class="form-group"><input name="destination" value="{{trip.destination}}" type="text" placeholder="Destination" required></div>
+                                <div class="form-group"><input name="departure_date" value="{{trip.departure_date}}" type="date"placeholder="Departure Date" required></div>
+                                <div class="form-group"><input name="return_date" value="{{trip.return_date}}" type="date"placeholder="Return Date" required></div>
+                                <div class="form-group"><button>{% if trip.id==-1 %}Add {% else %}Update {% endif %}Trip</button></div>
+                            </h4>
                 </form>
             </div>
 

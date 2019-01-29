@@ -1,26 +1,20 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Add an expense
+    Update a Life Expense
 {% endblock %}
 
 {% block body %}
-
-    <h1>New Expense for {{trip.name}}</h1>
-            <h2>
-            {{  message }} {{today}}
-
-            </h2>
+    <h3 class="menu">Update Life Expense for {{activeuser.username}}</h3>
             <div class="container">
-                <form action="{{ url_for('add_expense', trip_id=trip.id) }}" method="POST">
+                <form action="{{ url_for('edit_life_expense', expense_id=e.id) }}" method="POST">
                             <h3>
                                 <div class="form-inp"><input name="name" value="{{e.name}}" type="text" placeholder="Expense Name" required></div>
                                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
-                                <div class="form-inp"><select id="category" name="category" required>
-                                    <option value="" disabled="disabled" selected="selected">--Please select a category--</option>
+                                <div class="form-inp"><select name="category" required>
                                     {% for c in categories %}
-                                    <option value="{{c}}" {% if e.category==c %} selected="selected" {% endif %} >{{c}}</option>
+                                    <option value={{c}} {% if e.category==c %} selected="selected" {% endif %} >{{c}}</option>
                                     {% endfor %}
                                 </select></div>
                                 <div class="form-inp"><select id="frequency" name="frequency" required>
@@ -28,16 +22,16 @@
                                     <option value="{{f}}" {% if e.frequency==f %} selected="selected" {% endif %}>{{f}}</option>
                                     {% endfor %}
                                 </select></div>
-                                <div class="form-inp"><input id="myamount" name="amount" min=0 max=500000 step=0.01 value="{{e.amount}}" type="text" placeholder="Amount" required></div>
+                                <div class="form-inp"><input id="myamount" name="amount" value="{{e.amount}}" type="number" placeholder="Amount" required></div>
                                 <div class="form-inp"><input name="date" {%if e.date %}value="{{e.date}}" {% else %}  value={{today}} {% endif %} type="date" placeholder="Date" required></div>
-                                <div id="end_date" class="form-inp"><input name="end_date" value="{{trip.return_date}}" type="date" value="{{today}}" placeholder="End Date"></div>
-                                <div class="form-inp"><button>Add Expense</button></div>
+                                <div id="end_date" class="form-inp"><input name="end_date" value="None" type="date" placeholder="End Date"></div>
+                                <div class="form-inp"><button>Update</button></div>
+
                                 <script type="text/javascript">
                                     var myInput = document.querySelector('#myamount');
                                     myInput.addEventListener("keyup", function(){
                                       myInput.value = myInput.value.replace(/(\.\d{2})\d+/g, '$1');
                                     });
-
                                 </script>
 
                                 <script type="text/javascript">

@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Transaction List
+{% endblock %}
+
+{% block body %}
+{{df}}
+     <h3 class="menu">Transaction List</h3>
+
+<div id="Trip Transactions" class="container"><h3>Trip Transactions </h3>
+        <table class="table table-hover">
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">Transaction Name</th>
+                <th scope="col">Category</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Date</th>
+                <th scope="col">Transaction Type</th>
+            </tr>
+            </thead>
+            <tbody>
+    {% for t in transactions %}
+            <tr>
+                <td scope="row"><h5>{{t.name}} {% if t.trip_name %} ({{t.trip_name}}) {% endif %}</h5>
+                <td>{{ t.category }}</td>
+                <td>{{'${:,.2f}'.format(t.amount)}} / {{t.frequency}}</td>
+                <td>{{ t.date }}</td>
+                <td>{{t.transaction_type}}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td scope="row"></td>
+                <td scope="row"></td>
+                <td scope="row"><h5>{{'${:,.2f}'.format(total_cost)}}</h5></td>
+                <td scope="row"></td>
+                <td scope="row"></td>
+
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    {% endblock %}
