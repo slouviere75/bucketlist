@@ -7,5 +7,7 @@
     <orderEntry type="module" module-name="src4" />
     <orderEntry type="module" module-name="src4" />
     <orderEntry type="module" module-name="project1" />
+    <orderEntry type="library" name="R User Library" level="project" />
+    <orderEntry type="library" name="R Skeletons" level="application" />
   </component>
 </module>
