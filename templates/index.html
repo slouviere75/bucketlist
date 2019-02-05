@@ -7,24 +7,25 @@
 {% block body %}
        <div id="carouselLoaded" class="carousel slide carousel-fade" data-ride="carousel" data-pause="false">
            <div class="carousel-inner">
-                <div class="carousel-item active" data-interval="4000">
+                <div class="carousel-item active" data-interval="5000">
                     <img src="/static/images/{{carousel_first}}" class="d-block w-100" alt="test1">
-                    <div class="centered d-none d-md-block"><blockquote class="blockquote text-center">
+                    <div class="top-left d-none d-md-block"><blockquote class="blockquote text-center">
                       <p class="mb-0">{{quotes[0].quote}}</p>
                       <footer class="blockquote-footer">~<cite title="{{quotes[0].source}}">{{quotes[0].source}}</cite></footer>
                     </blockquote></div>
                 </div>
-               {% set count = 1 %}
-               {% for c in carousel_images %}
-               <div class="carousel-item"  data-interval="4000">
-                    <img src="/static/images/{{c}}" class="d-block w-100" alt="test1">
-                   <div class="top-left"><blockquote class="blockquote text-center">
-                      <p class="mb-0">{{quotes[count].quote}}</p>
-                      <footer class="blockquote-footer">~<cite title="{{quotes[0].source}}">{{quotes[0].source}}</cite></footer>
-                    </blockquote></div>
-               </div>
-               {% set count = count + 1 %}
-               {% endfor %}
+                {% set count = 1 %}
+                {% for c in carousel_images %}
+                   <div class="carousel-item"  data-interval="5000">
+                        <img src="/static/images/{{c}}" class="d-block w-100" alt="test1">
+                       <div class="top-left"><blockquote class="blockquote text-center">
+                          <p class="mb-0">{{quotes[loop.index].quote}}</p>
+                          <footer class="blockquote-footer">~<cite title="{{quotes[loop.index].source}}">{{quotes[count].source}}</cite></footer>
+
+                       </blockquote></div>
+                   </div>
+                    {% set count = count + 1 %}
+                {% endfor %}
             </div>
                <a class="carousel-control-prev" href="#carouselLoaded" role="button" data-slide="prev">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>

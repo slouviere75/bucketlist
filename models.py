@@ -6,6 +6,8 @@ from flask_session import Session
 from flask_sqlalchemy import SQLAlchemy
 from dateutil.relativedelta import *
 import datetime
+import pandas as pd
+import numpy as np
 
 
 db = SQLAlchemy()
@@ -151,31 +153,40 @@ class Life_Budget(db.Model):
     amount = db.Column(db.Float, nullable=False)
     category = db.Column(db.String, nullable=False)
 
-    def update_life_expense(self, name, frequency, category, amount, date, end_date):
+    def update_life_expense(self, name, frequency, category, amount, date, end_date, is_credit):
         self.name = name
         self.frequency = frequency
         self.category = category
         self.amount = amount
         self.date = date
         self.end_date = end_date
+        self.is_credit = is_credit
         db.session.commit()
 
 
 class Transaction():
     counter=1
 
-    def __init__(self, e, transaction_type, t):
-        self.id=Transaction.counter
+    def __init__(self, e, transaction_type, t, date, is_credit):
         Transaction.counter+=1
         self.name=e.name
         self.category=e.category
         self.frequency=e.frequency
-        self.amount=e.amount
-        self.date=e.date
-        if t: self.trip_id=e.trip
-        if t:self.trip_name=t.name
+        if is_credit:
+            self.amount=e.amount
+        else:
+            self.amount=-e.amount
+        self.date=date
         self.transaction_type=transaction_type
-
+        self.is_credit=is_credit
+        self.month=self.date.strftime('%B')
+        self.year=self.date.year
+        if t:
+            self.trip_id=e.trip
+            self.trip_name=t.name
+        else:
+            self.trip_id=None
+            self.trip_name=None
 
 
 class Quote(db.Model):

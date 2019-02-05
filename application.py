@@ -40,12 +40,13 @@ today = date.today()
 
 @app.route("/")
 def index():
-    if not ('user_id' in session):
-        return render_template("index.html", activeuser=None)
-    activeuser=User.query.get(session["user_id"])
     carousel_first, carousel_images = get_carousel_images(carousel_path)
     quotes=Quote.query.filter_by().all()
     random.shuffle(quotes)
+    if not ('user_id' in session):
+        return render_template("index.html", activeuser=None, carousel_first=carousel_first, carousel_images=carousel_images, quotes=quotes)
+    activeuser=User.query.get(session["user_id"])
+
     return render_template("index.html", activeuser=activeuser, message=None, carousel_first=carousel_first, carousel_images=carousel_images, quotes=quotes)
 
 @app.route("/bucketlist", methods=["GET","POST"])
@@ -192,6 +193,7 @@ def add_expense(trip_id):
         message = "Expense added successfully."
         trip = Trip.query.get(trip_id)
         activeuser=User.query.get(session["user_id"])
+
         trip.add_expense(name=name, category=category, frequency=frequency, amount=amount, date=date, end_date=end_date)
         trip.update_cost()
         activeuser.trips.sort(key=lambda x: x.departure_date, reverse=False)
@@ -265,6 +267,7 @@ def add_life_expense(user_id):
         return render_template("add_life_expense.html", message="", activeuser=activeuser, e=e, today = today, categories=life_categories, exp_freq=exp_freq)
     elif request.method == "POST":
         name = request.form.get("name")
+        options=request.form.get("options")
         category = request.form.get("category")
         frequency = request.form.get("frequency")
         amount = request.form.get("amount")
@@ -273,9 +276,12 @@ def add_life_expense(user_id):
         if frequency=="One-time":
             end_date = None
         if end_date=="":end_date=None
+        if options=="expense":
+            is_credit=False
+        else: is_credit=True
         message = "Life Expense added successfully."
         activeuser = User.query.get(session["user_id"])
-        activeuser.add_life_expense(name=name, category=category, frequency=frequency, amount=amount, date=date, end_date=end_date, is_credit=False)
+        activeuser.add_life_expense(name=name, category=category, frequency=frequency, amount=amount, date=date, end_date=end_date, is_credit=is_credit)
         activeuser.life_expenses.sort(key=lambda x: x.date, reverse=False)
         return render_template("life_budget.html",  message=message, activeuser=activeuser, exp_freq=exp_freq, categories=categories)
 
@@ -290,6 +296,7 @@ def edit_life_expense(expense_id):
             return render_template("edit_life_expense.html", activeuser=activeuser, e=e, exp_freq=exp_freq, today=today, categories = categories)
         elif request.method == "POST":
             name = request.form.get("name")
+            options=request.form.get("options")
             frequency = request.form.get("frequency")
             date = request.form.get("date")
             end_date = request.form.get("end_date")
@@ -297,7 +304,12 @@ def edit_life_expense(expense_id):
                 end_date=None
             amount = request.form.get("amount")
             category = request.form.get("category")
-            e.update_life_expense(name=name, frequency=frequency, date=date, end_date=end_date, amount=amount, category=category)
+            if end_date == "": end_date = None
+            if options=="expense":
+                is_credit=False
+            else:
+                is_credit=True
+            e.update_life_expense(name=name, frequency=frequency, date=date, end_date=end_date, amount=amount, category=category, is_credit=is_credit)
             message = "Expense updated successfully."
             activeuser.life_expenses.sort(key=lambda x: x.date, reverse=False)
             return render_template("life_budget.html", activeuser=activeuser, message=message)
@@ -383,6 +395,42 @@ def delete_quote( quote_id ):
     return render_template("quotes.html", message = "This entry does not exist.", activeuser=activeuser, quotes=quotes)
 
 
+@app.route("/convert", methods=["POST"])
+def convert():
+    if not ('user_id' in session):
+        return render_template("bucketlist.html", message="Please login first", activeuser=None)
+    activeuser = User.query.get(session["user_id"])
+    if request.method == "GET":
+        return render_template("convert.html", activeuser=activeuser, message=None)
+    elif request.method == "POST":
+        # Query for currency exchange rate
+        currency = request.form.get("currency")
+        res = requests.get("https://api.fixer.io/latest", params={
+            "base": "USD", "symbols": currency})
+
+        # Make sure request succeeded
+        if res.status_code != 200:
+            return jsonify({"success": False})
+
+        # Make sure currency is in response
+        data = res.json()
+        if currency not in data["rates"]:
+            return jsonify({"success": False})
+
+        return jsonify({"success": True, "rate": data["rates"][currency]})
+
+
+
+@app.route("/our_photos/", methods=["GET", "POST"])
+def our_photos():
+    if not ('user_id' in session):
+        return render_template("our_photos.html", message = None, activeuser=None)
+    activeuser = User.query.get(session["user_id"])
+    if request.method=="GET":
+        return render_template("our_photos.html", activeuser=activeuser, message=None, report_types=report_types, start="2019-01-01", end="2019-12-31")
+
+
+
 @app.route("/reports/", methods=["GET", "POST"])
 def reports():
     if not ('user_id' in session):
@@ -399,51 +447,53 @@ def reports():
         transactions=[]
         transaction_type="Trips"
         for trip in activeuser.trips:
+
             trip_cost=0
             for expense in trip.expenses:
+                if expense.end_date and expense.end_date < report_end_date:
+                    end_date = expense.end_date
+                else:
+                    end_date = report_end_date
                 if expense.frequency=="One-time":
-                    t=Transaction(e=expense, transaction_type=transaction_type, t=trip)
+                    date=expense.date
+                    t=Transaction(e=expense, transaction_type=transaction_type, t=trip, date=date, is_credit=False)
+
                     transactions.append(t)
                     trip_cost+=expense.amount
                 elif expense.frequency=="Daily":
                     date=expense.date
-                    while expense.date<=date<=expense.end_date:
-                        t=Transaction(e=expense, transaction_type=transaction_type, t=trip)
-                        t.date=date
-                        date = date + relativedelta(days=+1)
+                    while expense.date<=date<=end_date:
+                        t=Transaction(e=expense, transaction_type=transaction_type, t=trip, date=date, is_credit=False)
                         transactions.append(t)
+                        date = date + relativedelta(days=+1)
                         trip_cost += expense.amount
                 elif expense.frequency=="Weekly":
                     date=expense.date
-                    while expense.date<=date<=expense.end_date:
-                        t=Transaction(e=expense, transaction_type=transaction_type, t=trip)
-                        t.date=date
-                        date = date + relativedelta(weeks=+1)
+                    while expense.date<=date<=end_date:
+                        t=Transaction(e=expense, transaction_type=transaction_type, t=trip, date=date, is_credit=False)
                         transactions.append(t)
+                        date = date + relativedelta(weeks=+1)
                         trip_cost += expense.amount
                 elif expense.frequency=="Monthly":
                     date=expense.date
-                    while expense.date<=date<=expense.end_date:
-                        t=Transaction(e=expense, transaction_type=transaction_type, t=trip)
-                        t.date=date
-                        date=date+relativedelta(months=+1)
+                    while expense.date<=date<=end_date:
+                        t=Transaction(e=expense, transaction_type=transaction_type, t=trip, date=date, is_credit=False)
                         transactions.append(t)
+                        date=date+relativedelta(months=+1)
                         trip_cost += expense.amount
                 elif expense.frequency=="Quarterly":
                     date=expense.date
-                    while expense.date<=date<=expense.end_date:
-                        t=Transaction(e=expense, transaction_type=transaction_type, t=trip)
-                        t.date=date
-                        date=date+relativedelta(months=+3)
+                    while expense.date<=date<=end_date:
+                        t=Transaction(e=expense, transaction_type=transaction_type, t=trip, date=date, is_credit=False)
                         transactions.append(t)
+                        date=date+relativedelta(months=+3)
                         trip_cost += expense.amount
                 elif expense.frequency=="Yearly":
                     date=expense.date
-                    while expense.date<=date<=expense.end_date:
-                        t=Transaction(e=expense, transaction_type=transaction_type, t=trip)
-                        t.date=date
-                        date=date+relativedelta(years=+1)
+                    while expense.date<=date<=end_date:
+                        t=Transaction(e=expense, transaction_type=transaction_type, t=trip, date=date, is_credit=False)
                         transactions.append(t)
+                        date=date+relativedelta(years=+1)
                         trip_cost += expense.amount
             trip.cost=trip_cost
             db.session.commit()
@@ -453,53 +503,59 @@ def reports():
             if expense.end_date and expense.end_date<report_end_date:end_date=expense.end_date
             else: end_date=report_end_date
             if expense.frequency=="One-time":
-                t=Transaction(e=expense, transaction_type=transaction_type, t=None)
+                t=Transaction(e=expense, transaction_type=transaction_type, t=None, is_credit=expense.is_credit)
                 transactions.append(t)
-                trip_cost+=expense.amount
             elif expense.frequency=="Daily":
                 date=expense.date
                 while expense.date<=date<=end_date:
-                    t=Transaction(e=expense, transaction_type=transaction_type, t=None)
-                    t.date=date
-                    date = date + relativedelta(days=+1)
+                    t=Transaction(e=expense, transaction_type=transaction_type, t=None, date=date, is_credit=expense.is_credit)
                     transactions.append(t)
-                    trip_cost += expense.amount
+                    date = date + relativedelta(days=+1)
             elif expense.frequency=="Weekly":
                 date=expense.date
                 while expense.date<=date<=end_date:
-                    t=Transaction(e=expense, transaction_type=transaction_type, t=None)
-                    t.date=date
-                    date = date + relativedelta(weeks=+1)
+                    t=Transaction(e=expense, transaction_type=transaction_type, t=None, date=date, is_credit=expense.is_credit)
                     transactions.append(t)
-                    trip_cost += expense.amount
+                    date = date + relativedelta(weeks=+1)
             elif expense.frequency=="Monthly":
                 date=expense.date
                 while expense.date<=date<=end_date:
-                    t=Transaction(e=expense, transaction_type=transaction_type, t=None)
-                    t.date=date
-                    date=date+relativedelta(months=+1)
+                    t=Transaction(e=expense, transaction_type=transaction_type, t=None, date=date, is_credit=expense.is_credit)
                     transactions.append(t)
-                    trip_cost += expense.amount
+                    date=date+relativedelta(months=+1)
             elif expense.frequency=="Quarterly":
                 date=expense.date
                 while expense.date<=date<=end_date:
-                    t=Transaction(e=expense, transaction_type=transaction_type, t=None)
-                    t.date=date
-                    date=date+relativedelta(months=+3)
+                    t=Transaction(e=expense, transaction_type=transaction_type, t=None, date=date, is_credit=expense.is_credit)
                     transactions.append(t)
-                    trip_cost += expense.amount
+                    date=date+relativedelta(months=+3)
             elif expense.frequency=="Yearly":
                 date=expense.date
                 while expense.date<=date<=end_date:
-                    t=Transaction(e=expense, transaction_type=transaction_type, t=None)
-                    t.date=date
-                    date=date+relativedelta(years=+1)
+                    t=Transaction(e=expense, transaction_type=transaction_type, t=None, date=date, is_credit=expense.is_credit)
                     transactions.append(t)
-                    trip_cost += expense.amount
-
+                    date=date+relativedelta(years=+1)
+        t = transactions[0]
+        variables = [attr for attr in dir(t) if not callable(getattr(t, attr)) and not attr.startswith("__")]
         transactions.sort(key=lambda x: x.date)
-        total_cost=sum(transaction.amount for transaction in transactions )
-        return render_template("report1.html", transactions=transactions, activeuser=activeuser, total_cost=total_cost, df=df)
+        my_df=build_transaction_df(transactions, variables)
+        # grouped_df=my_df.groupby(['name',pd.Grouper(key='date', freq='M')])['amount'].sum()
+        my_df["date"] = pd.to_datetime(my_df['date'])
+        groupie_month = my_df.groupby([pd.Grouper(key='date', freq='M')])['amount'].sum()
+
+        groupie_cat = my_df.groupby([pd.Grouper(key='category')])['amount'].sum()
+        # my_df = my_df.groupby([pd.Grouper(key='date', freq='M')])['amount'].sum()
+        # my_df = my_df.reset_index()
+        grouped_df=groupie_month.reset_index()
+        grouped_df2=groupie_cat.reset_index()
+        grouped_df["date"]=pd.to_datetime(grouped_df["date"])
+        grouped_df["date"]=grouped_df["date"].dt.strftime('%B %Y')
+        table = pd.pivot_table(my_df, values='amount', index=['date'], columns = ['amount'], aggfunc = np.sum)
+        table= table.reset_index()
+
+
+        total_cost=sum(transaction.amount for transaction in transactions)
+        return render_template("report1.html", transactions=transactions, activeuser=activeuser, total_cost=total_cost, my_df=my_df.to_html(classes='data'), grouped_df=grouped_df.to_html(classes='data'), grouped_df2=grouped_df2.to_html(classes='data'), table=table.to_html(classes='data'))
 
 
 if __name__=="__main__":
@@ -511,3 +567,14 @@ def get_carousel_images(carousel_path):
     carousel_first = carousel_images[0]
     carousel_images.pop(0)
     return carousel_first, carousel_images
+
+def build_transaction_df(transactions, variables):
+    dict_conv={"name":[t.name for t in transactions], "category":[t.category for t in transactions], "frequency":[t.frequency for t in transactions], "amount":[t.amount for t in transactions], "date":[t.date for t in transactions], "trip_id":[t.trip_id for t in transactions], "trip_name":[t.trip_name for t in transactions], "transaction_type":[t.transaction_type for t in transactions]}
+    df_t = pd.DataFrame(dict_conv,columns=variables)
+    # df_t = df_t[["name", "category", "frequency", "amount", "date", "transaction_type"]]
+
+    # for t in transactions:
+    #     transaction={"name":t.name, "category":t.category, "frequency":t.frequency, "amount":t.amount, "date":t.date, "trip_id":t.trip_id, "trip_name":t.trip_name, "transaction_type":t.transaction_type}
+    #     df_t.append(transaction, ignore_index=True)
+    return df_t
+

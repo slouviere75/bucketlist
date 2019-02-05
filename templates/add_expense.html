@@ -15,6 +15,7 @@
                 <form action="{{ url_for('add_expense', trip_id=trip.id) }}" method="POST">
                             <h3>
                                 <div class="form-inp"><input name="name" value="{{e.name}}" type="text" placeholder="Expense Name" required></div>
+
                                 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
                                 <div class="form-inp"><select id="category" name="category" required>

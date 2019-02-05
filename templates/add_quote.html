@@ -9,10 +9,10 @@
             <div class="container">
                 <form action="{{ url_for('add_quote')}}" method="POST">
                             <h4>
-                                <div class="form-group"><input name="quote" value="{{quote.quote}}" type="text" placeholder="Quote" required></div>
-                                <div class="form-group"><input name="author" value="{{quote.author}}" type="text" placeholder="Author" ></div>
-                                <div class="form-group"><input name="source" value="{{quote.source}}" type="text" placeholder="Source" ></div>
-                                <div class="form-group"><input name="theme" value="{{quote.theme}}" type="text" placeholder="Theme" required></div>
+                                <div class="form-group"><input name="quote" value="" type="text" placeholder="Quote" required></div>
+                                <div class="form-group"><input name="author" value="" type="text" placeholder="Author" ></div>
+                                <div class="form-group"><input name="source" value="" type="text" placeholder="Source" ></div>
+                                <div class="form-group"><input name="theme" value="" type="text" placeholder="Theme" required></div>
                                 <div class="form-group"><button>Add Quote</button></div>
                             </h4>
                 </form>

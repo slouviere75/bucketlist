@@ -28,10 +28,21 @@
                 font-size: 1.6rem;
               }
             }
-            .blockquote {
-                background: rgba(204, 204, 204, 0.5)
+            .negative {
+                font-weight: bold;
+                color: #f9a7aa;
+            }
+            .positive {
+                color: #8fc48f;
+                font-weight: normal;
+                }
 
-                ;
+            .blockquote {
+                background: rgba(204, 204, 204, 0.5);
+                width: 50%;
+                padding:15px;
+                margin:15px;
+                border
             }
              .container {
                 padding: 2%;
@@ -42,12 +53,16 @@
                 font-weight: bold;
 
             }
+
+            .container.photos {
+                background-color: white;
+                }
             .menu {
                 padding-left: 35px;
                 padding-top: 10px;
             }
             .bumper {
-                margin-top: 106px;
+                margin-top: 1px;
             }
 
             .no_jump {
@@ -92,8 +107,6 @@
             .light-txt {
                 color: white;
             }
-            .inline  {
-            }
             .login {
                 display: flex;
                 flex-wrap: wrap;
@@ -121,14 +134,18 @@
                 color: black;
                 text-align: center;
             }
+            body {
+              padding-top: 107px;
+            }
+            @media (max-width: 979px) {
+              body {
+                padding-top: 107px;
+              }
+            }
             @media (max-width: 978px) {
                 .container {
                   padding:1%;
                   margin:1%;
-                }
-
-                body {
-                  padding:0;
                 }
 
                 .navbar-fixed-top, .navbar-fixed-bottom, .navbar-static-top {
@@ -140,7 +157,7 @@
         </style>
     </head>
     <body>
-
+        <header>
         <nav class="navbar navbar-expand-sm fixed-top navbar-dark bg-dark">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -159,8 +176,10 @@
                     <a class="nav-link" href="#">Blog</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="{{url_for('bucketlist')}}">Bucketlist Planner</a>
-                  <!--<hr class="my-4">-->
+                    <a class="nav-link" href="{{url_for('our_photos')}}">Our Photos</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{{url_for('bucketlist')}}">Travel Tools</a>
                   </li>
                   {%if activeuser!=None %}
                   <li class="nav-item">
@@ -180,7 +199,7 @@
                 </ul>
               </div>
         </nav>
-
+        </header>
         <div class="bumper">
             {% block body %}
             {% endblock %}
