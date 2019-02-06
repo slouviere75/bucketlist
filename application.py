@@ -6,15 +6,15 @@ import random
 import pandas as pd
 
 
-# Check for environment variable
-if not os.getenv("DATABASE_URL"):
-    raise RuntimeError("DATABASE_URL is not set")
+# # Check for environment variable
+# if not os.getenv("DATABASE_URL"):
+#     raise RuntimeError("DATABASE_URL is not set")
 
 #Get list of files in image directory that start with "carousel" for inclusion in Homepage carousel
 #Note that the first file needs to be separated from this list to iterate properly in Jinja, hence
 #the carousel_first variable
 
-carousel_path=os.getenv("CAROUSEL_PATH")
+carousel_path="./static/images"
 
 
 # Configure session to use filesystem
@@ -24,7 +24,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 Session(app)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgres://egldlzkbdfpagt:aaf63585b3a3914f93a03394f80efa4a472794f3d8cd478b2bd86399e69c3912@ec2-54-235-178-189.compute-1.amazonaws.com:5432/d96cp2dv3o4pv0"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # app.run(host= '0.0.0.0')
 db.init_app(app)

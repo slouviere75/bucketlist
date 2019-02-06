@@ -3,3 +3,8 @@ Flask
 Flask-Session
 psycopg2
 SQLAlchemy
+flask_sqlalchemy
+python-dateutil
+datetime
+numpy
+pandas
