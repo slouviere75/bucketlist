@@ -1,5 +1,6 @@
 import os
-from flask_session import Session
+# from flask_session import Session
+from flask_session.__init__ import Session
 from flask import Flask, render_template, jsonify, request, redirect
 from models import *
 import random
